@@ -1,0 +1,64 @@
+﻿@model List<SchoolApp.Models.UserModel>
+@{
+    ViewData["Title"] = "Users"; var role = ViewBag.Role as string; var isAdmin = role == "admin";
+}
+
+<h2 class="mb-3">👥 Users</h2>
+
+<form method="get" class="row g-2 mb-3">
+    <input type="hidden" name="role" value="@role" />
+    <div class="col-auto">
+        <input type="text" name="search" class="form-control" placeholder="Search name or email..." value="@ViewBag.Search" />
+    </div>
+    <div class="col-auto">
+        <input type="text" name="filterName" class="form-control" placeholder="Filter by first letter..." maxlength="1" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">🔍 Search</button>
+    </div>
+    @if (isAdmin)
+    {
+        <div class="col-auto ms-auto">
+            <a asp-action="Create" asp-route-role="@role" class="btn btn-primary">+ Add User</a>
+        </div>
+    }
+</form>
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr><th>#</th><th>Name</th><th>Email</th><th>Age</th>@if(isAdmin){
+                <th>Actions</th>
+                                }
+</tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">No users found.</td></tr>
+                }
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>@u.Id</td>
+                        <td>@u.Name</td>
+                        <td>@u.Email</td>
+                        <td>@u.Age</td>
+                        @if (isAdmin)
+                        {
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@u.Id" asp-route-role="@role" class="btn btn-sm btn-warning">Edit</a>
+                                <form asp-action="Delete" asp-route-id="@u.Id" asp-route-role="@role" method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this user?')">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

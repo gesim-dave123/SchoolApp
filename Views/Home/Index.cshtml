@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var role = ViewBag.Role as string ?? "guest";
+    var isAdmin = role == "admin";
+}
+
+<h2 class="mb-4">📊 Dashboard</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-white bg-primary">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="small text-white-50">Total Users</div>
+                    <h2 class="mb-0">@ViewBag.UserCount</h2>
+                </div>
+                <i class="bi bi-people-fill fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-white bg-success">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="small text-white-50">Transactions</div>
+                    <h2 class="mb-0">@ViewBag.TxCount</h2>
+                </div>
+                <i class="bi bi-receipt fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-white bg-info">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="small text-white-50">Total Amount</div>
+                    <h2 class="mb-0">₱@(((decimal)ViewBag.TotalAmount).ToString("N2"))</h2>
+                </div>
+                <i class="bi bi-currency-exchange fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!isAdmin)
+{
+    <div class="alert alert-warning">
+        <i class="bi bi-eye me-2"></i>
+        <strong>Guest Mode:</strong> You can view records but cannot add, edit, or delete.
+        Switch to <strong>Admin</strong> in the sidebar for full access.
+    </div>
+}
+else
+{
+    <div class="alert alert-success">
+        <i class="bi bi-shield-check me-2"></i>
+        <strong>Admin Mode:</strong> You have full access to all features.
+    </div>
+}
