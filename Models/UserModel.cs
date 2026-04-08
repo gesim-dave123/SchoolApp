@@ -25,10 +25,12 @@ namespace SchoolApp.Models
         [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
 
-        [NotMapped]  // ← Not saved to DB, only used for form validation
+        [NotMapped]
         [Required(ErrorMessage = "Please confirm your password.")]
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        public string Role { get; set; } = "guest"; // "admin" or "guest"
     }
 }

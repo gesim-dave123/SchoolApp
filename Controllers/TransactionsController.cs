@@ -1,62 +1,60 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SchoolApp.Data;
 using SchoolApp.Models;
 
 namespace SchoolApp.Controllers
 {
+    [Authorize]
     public class TransactionsController : Controller
     {
         private readonly AppDbContext _db;
+        public TransactionsController(AppDbContext db) { _db = db; }
 
-        public TransactionsController(AppDbContext db)
-        {
-            _db = db;
-        }
+        private string CurrentRole =>
+            User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "guest";
 
-        // LIST with Search + Filter
-        public IActionResult Index(string role = "guest", string search = "",
-                                   string category = "", string dateFrom = "")
+        public IActionResult Index(string search = "", string category = "", string dateFrom = "")
         {
-            ViewBag.Role = role;
+            ViewBag.Role = CurrentRole;
             ViewBag.Search = search;
 
             var txs = _db.Transactions.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
                 txs = txs.Where(t => t.Description.Contains(search));
-
             if (!string.IsNullOrEmpty(category))
                 txs = txs.Where(t => t.Category == category);
-
             if (DateTime.TryParse(dateFrom, out var dt))
                 txs = txs.Where(t => t.Date >= dt);
 
             return View(txs.OrderByDescending(t => t.Date).ToList());
         }
 
-        // CREATE (GET)
-        public IActionResult Create(string role = "guest")
+        [Authorize(Roles = "admin")]
+        public IActionResult Create()
         {
-            ViewBag.Role = role;
+            ViewBag.Role = CurrentRole;
             return View();
         }
 
-        // CREATE (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(TransactionModel model, string role = "guest")
+        [Authorize(Roles = "admin")]
+        public IActionResult Create(TransactionModel model)
         {
-            ViewBag.Role = role;
-
+            ViewBag.Role = CurrentRole;
             if (!ModelState.IsValid)
-                return View(model);
+            {
+                TempData["Error"] = "Unable to add transaction. Please complete all required fields.";
+                return RedirectToAction("Index");
+            }
 
             model.Date = DateTime.Now;
             _db.Transactions.Add(model);
-            _db.SaveChanges();  // ✅ Saves to SQLite
-
+            _db.SaveChanges();
             TempData["Success"] = "Transaction added!";
-            return RedirectToAction("Index", new { role });
+            return RedirectToAction("Index");
         }
     }
 }

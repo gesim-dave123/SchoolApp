@@ -4,13 +4,13 @@
 }
 
 <h2 class="mb-4">➕ Add Transaction</h2>
-<div class="card shadow-sm border-0" style="max-width:500px">
+<div class="card border-0 shadow-sm" style="max-width:560px; border-radius: 14px;">
     <div class="card-body p-4">
         <form asp-action="Create" asp-route-role="@ViewBag.Role" method="post">
             @Html.AntiForgeryToken()
             <div class="mb-3">
                 <label asp-for="Description" class="form-label fw-semibold"></label>
-                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter transaction details"></textarea>
                 <span asp-validation-for="Description" class="text-danger small"></span>
             </div>
             <div class="mb-3">
@@ -30,7 +30,7 @@
                     <option value="Order">Order</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-success">Save Transaction</button>
+            <button type="submit" class="btn btn-success px-4">Save Transaction</button>
             <a asp-action="Index" asp-route-role="@ViewBag.Role" class="btn btn-secondary ms-2">Cancel</a>
         </form>
     </div>

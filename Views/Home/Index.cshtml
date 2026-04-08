@@ -3,57 +3,176 @@
     var role = ViewBag.Role as string ?? "guest";
     var isAdmin = role == "admin";
 }
+    <style >
+    .kpi-card {
+        border-radius: 16px;
+        transition: all 0.3s ease; /* Smoother transition for color and transform */
+        background-color: #ffffff;
+        cursor: pointer;
+    }
 
-<h2 class="mb-4">📊 Dashboard</h2>
+    /* Hover State: Darken background to match sidebar and lift card */
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        background-color: #212529; /* Standard Bootstrap dark / Sidebar color */
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+    }
 
-<div class="row g-4 mb-4">
+        /* Change text colors to white when the card is hovered */
+        .kpi-card:hover h3,
+        .kpi-card:hover .text-muted,
+        .kpi-card:hover .text-dark {
+            color: #ffffff !important;
+        }
+
+        /* Adjust the icon box and badges to look better on dark background */
+        .kpi-card:hover .icon-box {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+        }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .alert-card {
+        border-radius: 16px;
+        border-left: 6px solid;
+    }
+
+    .alert-admin {
+        border-left-color: #10b981;
+        background: #ecfdf5;
+    }
+
+    .alert-guest {
+        border-left-color: #f59e0b;
+        background: #fffbeb;
+    }
+</style>
+
+
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2 class="h3 fw-bold text-dark mb-1">Overview</h2>
+        <p class="text-muted small mb-0">Here's what's happening with your platform today.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm text-white bg-primary">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="small text-white-50">Total Users</div>
-                    <h2 class="mb-0">@ViewBag.UserCount</h2>
+        <div class="card border-0 shadow-sm kpi-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-people-fill fs-4"></i>
+                    </div>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-semibold">+12%</span>
                 </div>
-                <i class="bi bi-people-fill fs-1 opacity-50"></i>
+                <h3 class="fw-bold text-dark mb-1">@ViewBag.UserCount</h3>
+                <div class="text-muted small fw-medium text-uppercase letter-spacing-1">Total Users</div>
             </div>
         </div>
     </div>
+
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm text-white bg-success">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="small text-white-50">Transactions</div>
-                    <h2 class="mb-0">@ViewBag.TxCount</h2>
+        <div class="card border-0 shadow-sm kpi-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="icon-box bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-receipt fs-4"></i>
+                    </div>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-semibold">+5%</span>
                 </div>
-                <i class="bi bi-receipt fs-1 opacity-50"></i>
+                <h3 class="fw-bold text-dark mb-1">@ViewBag.TxCount</h3>
+                <div class="text-muted small fw-medium text-uppercase letter-spacing-1">Transactions Logged</div>
             </div>
         </div>
     </div>
+
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm text-white bg-info">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="small text-white-50">Total Amount</div>
-                    <h2 class="mb-0">₱@(((decimal)ViewBag.TotalAmount).ToString("N2"))</h2>
+        <div class="card border-0 shadow-sm kpi-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="icon-box bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-currency-exchange fs-4"></i>
+                    </div>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-semibold">+8.4%</span>
                 </div>
-                <i class="bi bi-currency-exchange fs-1 opacity-50"></i>
+                <h3 class="fw-bold text-dark mb-1">₱@(((decimal)ViewBag.TotalAmount).ToString("N2"))</h3>
+                <div class="text-muted small fw-medium text-uppercase letter-spacing-1">Total Revenue</div>
             </div>
         </div>
     </div>
 </div>
 
-@if (!isAdmin)
-{
-    <div class="alert alert-warning">
-        <i class="bi bi-eye me-2"></i>
-        <strong>Guest Mode:</strong> You can view records but cannot add, edit, or delete.
-        Switch to <strong>Admin</strong> in the sidebar for full access.
+<div class="row g-4">
+    <div class="col-lg-7">
+        <h5 class="fw-bold mb-3 text-dark">System Status</h5>
+        @if (!isAdmin)
+        {
+            <div class="card border-0 shadow-sm alert-card alert-guest p-2">
+                <div class="card-body d-flex align-items-start gap-3">
+                    <div class="mt-1">
+                        <i class="bi bi-shield-exclamation fs-3 text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Guest Mode Active</h6>
+                        <p class="text-muted small mb-0">You are viewing the system in read-only mode. You can view records but cannot add, edit, or delete them. Switch to an Admin account to unlock full access.</p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card border-0 shadow-sm alert-card alert-admin p-2">
+                <div class="card-body d-flex align-items-start gap-3">
+                    <div class="mt-1">
+                        <i class="bi bi-shield-check fs-3 text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Admin Mode Active</h6>
+                        <p class="text-muted small mb-0">You currently have full administrative access. You can manage users, record transactions, and alter system configurations.</p>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-}
-else
-{
-    <div class="alert alert-success">
-        <i class="bi bi-shield-check me-2"></i>
-        <strong>Admin Mode:</strong> You have full access to all features.
+
+    <div class="col-lg-5">
+        <h5 class="fw-bold mb-3 text-dark">Quick Actions</h5>
+        <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+            <div class="card-body p-4">
+                <div class="d-grid gap-3">
+                    <a href="@Url.Action("Index", "Users", new { openAddUser = 1 })" class="btn btn-light text-start p-3 border shadow-sm rounded-3 d-flex align-items-center @(!isAdmin ? "disabled" : "")">
+                        <div class="icon-box bg-primary bg-opacity-10 text-primary me-3" style="width: 40px; height: 40px;">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Register New User</div>
+                            <div class="small text-muted">Create a new account profile</div>
+                        </div>
+                        <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                    </a>
+
+                    <a href="@Url.Action("Index", "Transactions")" class="btn btn-light text-start p-3 border shadow-sm rounded-3 d-flex align-items-center">
+                        <div class="icon-box bg-info bg-opacity-10 text-info me-3" style="width: 40px; height: 40px;">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Manage Finances</div>
+                            <div class="small text-muted">View or log new transactions</div>
+                        </div>
+                        <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-}
+</div>

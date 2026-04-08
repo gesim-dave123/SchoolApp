@@ -1,0 +1,144 @@
+@model SchoolApp.Models.UserModel
+@{
+    ViewData["Title"] = "Edit User";
+    var currentRole = ViewBag.Role as string;
+    // Check if the user being edited is an admin
+    bool isUserAdmin = Model.Role?.Equals("admin", StringComparison.OrdinalIgnoreCase) ?? false;
+}
+
+<style>
+    .edit-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .form-section-title {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .input-custom {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 0.6rem 1rem;
+    }
+
+        .input-custom:focus {
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+            border-color: #0d6efd;
+        }
+
+        .input-custom:disabled {
+            background-color: #f8fafc !important;
+            cursor: not-allowed;
+        }
+
+    .btn-edit-theme {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+        .btn-edit-theme:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
+
+    .text-edit-theme {
+        color: #0d6efd;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" asp-route-role="@currentRole" class="btn btn-light rounded-circle p-2 me-3 shadow-sm border">
+                    <i class="bi bi-arrow-left fs-5 text-edit-theme"></i>
+                </a>
+                <div>
+                    <h2 class="h3 mb-1 fw-bold text-dark">Edit User Profile</h2>
+                    <p class="text-muted small mb-0">Modify information for <strong>@Model.Name</strong></p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm edit-card">
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input asp-for="Id" type="hidden" />
+
+                        <div class="text-uppercase text-edit-theme fw-bold form-section-title mb-4">Account Details</div>
+
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                <label asp-for="Name" class="form-label small fw-bold text-muted">Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-edit-theme"></i></span>
+                                    <input asp-for="Name" class="form-control input-custom border-start-0 bg-light" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small ms-1"></span>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label asp-for="Email" class="form-label small fw-bold text-muted">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-edit-theme"></i></span>
+                                    <input asp-for="Email" class="form-control input-custom border-start-0 bg-light" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small ms-1"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Age" class="form-label small fw-bold text-muted">Age</label>
+                                <input asp-for="Age" class="form-control input-custom bg-light" type="number" />
+                                <span asp-validation-for="Age" class="text-danger small ms-1"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Role" class="form-label small fw-bold text-muted">System Role</label>
+
+                                @if (isUserAdmin)
+                                {
+                                    <select class="form-select input-custom" disabled>
+                                        <option value="admin" selected>Administrator</option>
+                                    </select>
+                                    <input type="hidden" asp-for="Role" />
+                                    <div class="form-text small text-info"><i class="bi bi-info-circle me-1"></i>Admin roles cannot be changed here.</div>
+                                }
+                                else
+                                {
+                                    <select asp-for="Role" class="form-select input-custom bg-light">
+                                        <option value="guest">Guest</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
+                                }
+                                <span asp-validation-for="Role" class="text-danger small ms-1"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-5 opacity-25" />
+
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <a asp-action="Index" asp-route-role="@currentRole" class="btn btn-light px-4 border">Cancel</a>
+                            <button type="submit" class="btn btn-edit-theme px-5 fw-bold shadow-sm">
+                                <i class="bi bi-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted small">User ID Reference: <span class="fw-bold">#@Model.Id</span></p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

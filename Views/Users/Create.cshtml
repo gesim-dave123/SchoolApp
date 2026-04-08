@@ -3,39 +3,80 @@
     ViewData["Title"] = "Add User";
 }
 
-<h2 class="mb-4">➕ Add New User</h2>
-<div class="card shadow-sm border-0" style="max-width:600px">
-    <div class="card-body p-4">
-        <form asp-action="Create" asp-route-role="@ViewBag.Role" method="post">
-            @Html.AntiForgeryToken()
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label fw-semibold"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger small"></span>
+<!-- Button to trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+    <i class="bi bi-plus-circle"></i> Add New User
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="addUserModalLabel">
+                    <i class="bi bi-person-plus-fill text-primary"></i> Add New User
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label fw-semibold"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-4">
+                <form asp-action="Create" asp-route-role="@ViewBag.Role" method="post" id="addUserForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-semibold"></label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter full name" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold"></label>
+                        <input asp-for="Email" class="form-control" placeholder="Enter email address" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Age" class="form-label fw-semibold"></label>
+                        <input asp-for="Age" class="form-control" type="number" placeholder="Enter age" />
+                        <span asp-validation-for="Age" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <input asp-for="Password" class="form-control" type="password" id="createUserPassword" placeholder="Enter password" />
+                            <button class="btn btn-outline-secondary" type="button" data-toggle-password="createUserPassword" aria-label="Show password">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <input asp-for="ConfirmPassword" class="form-control" type="password" id="createUserConfirmPassword" placeholder="Confirm password" />
+                            <button class="btn btn-outline-secondary" type="button" data-toggle-password="createUserConfirmPassword" aria-label="Show confirm password">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-                <label asp-for="Age" class="form-label fw-semibold"></label>
-                <input asp-for="Age" class="form-control" type="number" />
-                <span asp-validation-for="Age" class="text-danger small"></span>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </button>
+                <button type="submit" form="addUserForm" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Save User
+                </button>
             </div>
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label fw-semibold"></label>
-                <input asp-for="Password" class="form-control" type="password" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
-                <input asp-for="ConfirmPassword" class="form-control" type="password" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-            </div>
-            <button type="submit" class="btn btn-primary">Save User</button>
-            <a asp-action="Index" asp-route-role="@ViewBag.Role" class="btn btn-secondary ms-2">Cancel</a>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -43,4 +84,59 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Password toggle functionality
+        document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const input = document.getElementById(btn.getAttribute('data-toggle-password'));
+                const icon = btn.querySelector('i');
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
+                icon.classList.toggle('bi-eye', !isHidden);
+                icon.classList.toggle('bi-eye-slash', isHidden);
+            });
+        });
+
+        // Reset form when modal is closed
+        const addUserModal = document.getElementById('addUserModal');
+        addUserModal.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('addUserForm').reset();
+            // Clear validation messages
+            document.querySelectorAll('.text-danger').forEach(span => span.textContent = '');
+        });
+    </script>
 }
+
+<style>
+    /* Custom modal animations */
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+        transform: translateY(-50px);
+    }
+
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
+
+    /* Custom styling for modal */
+    .modal-content {
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-header .modal-title {
+            color: white !important;
+        }
+
+            .modal-header .modal-title i {
+                color: white !important;
+            }
+</style>

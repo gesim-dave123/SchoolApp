@@ -1,25 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolApp.Data;
 using SchoolApp.Models;
 
 namespace SchoolApp.Controllers
 {
+    [Authorize]  // ✅ All actions require login
     public class UsersController : Controller
     {
         private readonly AppDbContext _db;
+        public UsersController(AppDbContext db) { _db = db; }
 
-        public UsersController(AppDbContext db)
-        {
-            _db = db;
-        }
+        private string CurrentRole =>
+            User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "guest";
 
-        // LIST with Search + Filter
-        public IActionResult Index(string role = "guest", string search = "", string filterLetter = "")
+        public IActionResult Index(string search = "", string filterLetter = "")
         {
-            ViewBag.Role = role;
+            ViewBag.Role = CurrentRole;
             ViewBag.Search = search;
-            ViewBag.FilterLetter = filterLetter;
 
             var users = _db.Users.AsQueryable();
 
@@ -32,52 +31,56 @@ namespace SchoolApp.Controllers
             return View(users.ToList());
         }
 
-        // CREATE (GET)
-        public IActionResult Create(string role = "guest")
+        [Authorize(Roles = "admin")]  // ✅ Admin only
+        public IActionResult Create()
         {
-            ViewBag.Role = role;
+            ViewBag.Role = CurrentRole;
             return View();
         }
 
-        // CREATE (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(UserModel model, string role = "guest")
+        [Authorize(Roles = "admin")]
+        public IActionResult Create(UserModel model)
         {
-            ViewBag.Role = role;
-
+            ViewBag.Role = CurrentRole;
             if (!ModelState.IsValid)
-                return View(model);
+            {
+                TempData["Error"] = "Unable to add user. Please complete all required fields.";
+                return RedirectToAction("Index");
+            }
+
+            if (_db.Users.Any(u => u.Email == model.Email))
+            {
+                TempData["Error"] = "Email already exists.";
+                return RedirectToAction("Index");
+            }
 
             _db.Users.Add(model);
-            _db.SaveChanges();  // ✅ Saves to SQLite
-
-            TempData["Success"] = $"User '{model.Name}' added successfully!";
-            return RedirectToAction("Index", new { role });
+            _db.SaveChanges();
+            TempData["Success"] = $"User '{model.Name}' added!";
+            return RedirectToAction("Index");
         }
 
-        // EDIT (GET)
-        public IActionResult Edit(int id, string role = "guest")
+        [Authorize(Roles = "admin")]
+        public IActionResult Edit(int id)
         {
-            ViewBag.Role = role;
+            ViewBag.Role = CurrentRole;
             var user = _db.Users.Find(id);
             if (user == null) return NotFound();
             return View(user);
         }
 
-        // EDIT (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(UserModel model, string role = "guest")
+        [Authorize(Roles = "admin")]
+        public IActionResult Edit(UserModel model)
         {
-            ViewBag.Role = role;
-
-            // Remove ConfirmPassword validation on edit (field may be blank)
+            ViewBag.Role = CurrentRole;
             ModelState.Remove("ConfirmPassword");
             ModelState.Remove("Password");
 
-            if (!ModelState.IsValid)
-                return View(model);
+            if (!ModelState.IsValid) return View(model);
 
             var existing = _db.Users.Find(model.Id);
             if (existing == null) return NotFound();
@@ -85,26 +88,26 @@ namespace SchoolApp.Controllers
             existing.Name = model.Name;
             existing.Email = model.Email;
             existing.Age = model.Age;
+            existing.Role = model.Role;
 
-            _db.SaveChanges();  // ✅ Updates in SQLite
-
-            TempData["Success"] = "User updated successfully!";
-            return RedirectToAction("Index", new { role });
+            _db.SaveChanges();
+            TempData["Success"] = "User updated!";
+            return RedirectToAction("Index");
         }
 
-        // DELETE (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id, string role = "guest")
+        [Authorize(Roles = "admin")]
+        public IActionResult Delete(int id)
         {
             var user = _db.Users.Find(id);
             if (user != null)
             {
                 _db.Users.Remove(user);
-                _db.SaveChanges();  // ✅ Deletes from SQLite
+                _db.SaveChanges();
                 TempData["Success"] = "User deleted.";
             }
-            return RedirectToAction("Index", new { role });
+            return RedirectToAction("Index");
         }
     }
 }

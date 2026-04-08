@@ -4,88 +4,237 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SchoolApp</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
-        body { display: flex; min-height: 100vh; }
-        .sidebar {
-            width: 240px; min-height: 100vh;
-            background: #1e293b; color: white; padding: 20px 0;
-            position: fixed; top: 0; left: 0;
+        :root {
+            --sidebar-width: 280px;
+            --primary-dark: #0f172a;
+            --accent-blue: #3b82f6;
+            --bg-light: #f1f5f9;
         }
-        .sidebar .brand { padding: 10px 20px 20px; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #334155; }
-        .sidebar .role-badge { padding: 8px 20px; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
-        .sidebar a { display: block; padding: 10px 20px; color: #cbd5e1; text-decoration: none; }
-        .sidebar a:hover, .sidebar a.active { background: #334155; color: white; }
-        .sidebar .nav-section { padding: 8px 20px 4px; font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
-        .main-content { margin-left: 240px; flex: 1; padding: 30px; background: #f8fafc; }
-        .role-switcher { padding: 10px 20px; margin-top: 20px; border-top: 1px solid #334155; }
+
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar Improvements --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary-dark);
+            color: white;
+            position: fixed;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .sidebar .brand {
+                padding: 24px;
+                font-size: 1.4rem;
+                font-weight: 800;
+                letter-spacing: -0.5px;
+                display: flex;
+                align-items: center;
+                background: rgba(255,255,255,0.03);
+            }
+
+        .nav-wrapper {
+            flex-grow: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar .nav-link {
+            margin: 4px 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+            .sidebar .nav-link i {
+                font-size: 1.2rem;
+                margin-right: 12px;
+            }
+
+            .sidebar .nav-link:hover {
+                background: rgba(255, 255, 255, 0.08);
+                color: white;
+                transform: translateX(4px);
+            }
+
+            .sidebar .nav-link.active {
+                background: var(--accent-blue);
+                color: white;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            }
+
+        /* --- Main Content Area --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .top-navbar {
+            padding: 30px 32px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .content-container {
+            padding: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+
+        /* --- Profile Section --- */
+        .user-profile-box {
+            margin: 16px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* --- Responsive Behavior --- */
+        &#64;media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+                .sidebar.active {
+                    transform: translateX(0);
+                }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+        }
     </style>
 </head>
 <body>
-@{
-    var role = ViewBag.Role as string ?? "guest";
-    var isAdmin = role == "admin";
-}
-<div class="sidebar">
-    <div class="brand"><i class="bi bi-grid-3x3-gap-fill me-2"></i>SchoolApp</div>
-    <div class="role-badge">Logged in as: <strong>@role.ToUpper()</strong></div>
 
-    <div class="nav-section">Main</div>
-    <a href="@Url.Action("Index","Home", new{role})" class="@(ViewContext.RouteData.Values["controller"]?.ToString()=="Home"?"active":"")">
-        <i class="bi bi-speedometer2 me-2"></i>Dashboard
-    </a>
-
-    <div class="nav-section">Users</div>
-    <a href="@Url.Action("Index","Users", new{role})">
-        <i class="bi bi-people me-2"></i>View Users
-    </a>
-    @if (isAdmin)
-    {
-        <a href="@Url.Action("Create","Users", new{role})">
-            <i class="bi bi-person-plus me-2"></i>Add User
-        </a>
-    }
-
-    <div class="nav-section">Transactions</div>
-    <a href="@Url.Action("Index","Transactions", new{role})">
-        <i class="bi bi-receipt me-2"></i>View Transactions
-    </a>
-    @if (isAdmin)
-    {
-        <a href="@Url.Action("Create","Transactions", new{role})">
-            <i class="bi bi-plus-circle me-2"></i>Add Transaction
-        </a>
-    }
-
-    <div class="role-switcher">
-        <label class="text-muted small">Switch Role:</label>
-        <select class="form-select form-select-sm mt-1" onchange="window.location='?role='+this.value">
-            @if (role == "guest")
-            {
-                <option value="guest" selected>Guest</option>
-                <option value="admin">Admin</option>
-            }
-            else
-            {
-                <option value="guest">Guest</option>
-                <option value="admin" selected>Admin</option>
-            }
-        </select>
-    </div>
-</div>
-
-<div class="main-content">
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="bg-primary rounded-3 p-1 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="bi bi-mortarboard-fill text-white fs-5"></i>
+            </div>
+            SchoolApp
         </div>
-    }
-    @RenderBody()
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-@await RenderSectionAsync("Scripts", required: false)
+        <div class="nav-wrapper">
+            @{
+                var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+            }
+
+            <a href="@Url.Action("Index", "Home")" class="nav-link @(currentController == "Home" ? "active" : "")">
+                <i class="bi bi-house-door"></i> Dashboard
+            </a>
+
+            <a href="@Url.Action("Index", "Users")" class="nav-link @(currentController == "Users" ? "active" : "")">
+                <i class="bi bi-people"></i> Users
+            </a>
+
+            <a href="@Url.Action("Index", "Transactions")" class="nav-link @(currentController == "Transactions" ? "active" : "")">
+                <i class="bi bi-wallet2"></i> Transactions
+            </a>
+        </div>
+
+        <div class="user-profile-box mt-auto">
+            <div class="d-flex align-items-center mb-3">
+                <div class="avatar me-2 bg-info rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 35px; height: 35px;">
+                    @User.Identity?.Name?.Substring(0, 1).ToUpper()
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-white small fw-bold text-truncate">@User.Identity?.Name</div>
+                    <span class="badge bg-opacity-25 bg-light text-white" style="font-size: 0.6rem;">@ViewBag.Role?.ToString().ToUpper()</span>
+                </div>
+            </div>
+            <a asp-controller="Auth" asp-action="Logout" class="btn btn-sm btn-outline-danger w-100 border-0 bg-danger bg-opacity-10">
+                <i class="bi bi-box-arrow-left me-2"></i>Sign Out
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        <header class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-light mobile-toggle me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">SchoolApp</a></li>
+                        <li class="breadcrumb-item active fw-semibold">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+
+        </header>
+
+        <div class="content-container">
+            <div class="content-card">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        @if (TempData["Success"] != null)
+        {
+            <div class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body"><i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Initialize Toasts
+        document.querySelectorAll('.toast').forEach(t => new bootstrap.Toast(t, { delay: 4000 }).show());
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

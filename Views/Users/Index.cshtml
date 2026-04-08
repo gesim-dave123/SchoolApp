@@ -1,59 +1,164 @@
 ﻿@model List<SchoolApp.Models.UserModel>
 @{
-    ViewData["Title"] = "Users"; var role = ViewBag.Role as string; var isAdmin = role == "admin";
+    ViewData["Title"] = "Users";
+    var role = ViewBag.Role as string;
+    var isAdmin = role == "admin";
+    var openAddUserModal = Context.Request.Query["openAddUser"].ToString() == "1";
 }
 
-<h2 class="mb-3">👥 Users</h2>
+<style>
+    .table-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
 
-<form method="get" class="row g-2 mb-3">
-    <input type="hidden" name="role" value="@role" />
-    <div class="col-auto">
-        <input type="text" name="search" class="form-control" placeholder="Search name or email..." value="@ViewBag.Search" />
-    </div>
-    <div class="col-auto">
-        <input type="text" name="filterName" class="form-control" placeholder="Filter by first letter..." maxlength="1" />
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-outline-primary">🔍 Search</button>
+    .filter-section {
+        background: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #eef2f7;
+    }
+
+    .avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .bg-avatar-1 {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .bg-avatar-2 {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .bg-avatar-3 {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .bg-avatar-4 {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="h3 mb-1 fw-bold text-dark">User Management</h2>
+        <p class="text-muted small mb-0">View, search, and manage platform accounts.</p>
     </div>
     @if (isAdmin)
     {
-        <div class="col-auto ms-auto">
-            <a asp-action="Create" asp-route-role="@role" class="btn btn-primary">+ Add User</a>
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary shadow-sm px-4" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                <i class="bi bi-person-plus-fill me-2"></i>Add User
+            </button>
         </div>
     }
-</form>
+</div>
 
-<div class="card shadow-sm border-0">
+<div class="filter-section mb-4 shadow-sm">
+    <form method="get" class="row g-3 align-items-end">
+        <input type="hidden" name="role" value="@role" />
+        <div class="col-md-5">
+            <label class="form-label small fw-bold text-uppercase text-muted">Search Users</label>
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Search name or email..." value="@ViewBag.Search" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-bold text-uppercase text-muted">Filter by Letter</label>
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-alphabet"></i></span>
+                <input type="text" name="filterLetter" class="form-control border-start-0" placeholder="e.g. A" maxlength="1" />
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-primary w-100">
+                <i class="bi bi-funnel me-1"></i> Apply
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card border-0 shadow-sm table-card">
     <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead class="table-dark">
-                <tr><th>#</th><th>Name</th><th>Email</th><th>Age</th>@if(isAdmin){
-                <th>Actions</th>
-                                }
-</tr>
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted" style="width: 80px;">ID</th>
+                    <th class="py-3 text-uppercase small fw-bold text-muted">User</th>
+                    <th class="py-3 text-uppercase small fw-bold text-muted">Contact Info</th>
+                    <th class="py-3 text-uppercase small fw-bold text-muted">Age</th>
+                    @if (isAdmin)
+                    {
+                        <th class="py-3 pe-4 text-end text-uppercase small fw-bold text-muted">Actions</th>
+                    }
+                </tr>
             </thead>
             <tbody>
                 @if (!Model.Any())
                 {
-                    <tr><td colspan="5" class="text-center text-muted py-4">No users found.</td></tr>
+                    <tr>
+                        <td colspan="@(isAdmin ? 5 : 4)" class="text-center py-5">
+                            <i class="bi bi-people text-light display-1 d-block mb-3"></i>
+                            <span class="text-muted fw-medium">No users found.</span>
+                        </td>
+                    </tr>
                 }
                 @foreach (var u in Model)
                 {
+                    // Generate a dynamic initial and color based on ID so it remains consistent
+                    string initial = !string.IsNullOrEmpty(u.Name) ? u.Name.Substring(0, 1).ToUpper() : "?";
+                    string avatarClass = "bg-avatar-" + ((u.Id % 4) + 1);
+
                     <tr>
-                        <td>@u.Id</td>
-                        <td>@u.Name</td>
-                        <td>@u.Email</td>
-                        <td>@u.Age</td>
+                        <td class="ps-4 text-muted small">#@u.Id</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle @avatarClass me-3 shadow-sm">
+                                    @initial
+                                </div>
+                                <div class="fw-semibold text-dark">@u.Name</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-muted d-flex align-items-center">
+                                <i class="bi bi-envelope me-2 text-secondary"></i>@u.Email
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border px-2 py-1">@u.Age yrs</span>
+                        </td>
                         @if (isAdmin)
                         {
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@u.Id" asp-route-role="@role" class="btn btn-sm btn-warning">Edit</a>
-                                <form asp-action="Delete" asp-route-id="@u.Id" asp-route-role="@role" method="post" class="d-inline"
-                                      onsubmit="return confirm('Delete this user?')">
-                                    @Html.AntiForgeryToken()
-                                    <button class="btn btn-sm btn-danger">Delete</button>
-                                </form>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <button type="button" class="btn btn-sm btn-light border" title="Edit"
+                                            data-bs-toggle="modal" data-bs-target="#editUserModal"
+                                            data-user-id="@u.Id"
+                                            data-user-name="@u.Name"
+                                            data-user-email="@u.Email"
+                                            data-user-age="@u.Age"
+                                            data-user-role="@u.Role">
+                                        <i class="bi bi-pencil-square text-primary"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-light border text-danger" title="Delete"
+                                            data-bs-toggle="modal" data-bs-target="#deleteUserModal"
+                                            data-user-id="@u.Id" data-user-name="@u.Name">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         }
                     </tr>
@@ -62,3 +167,193 @@
         </table>
     </div>
 </div>
+
+@if (isAdmin)
+{
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg text-white">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Edit User</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="Edit" asp-route-role="@role" method="post">
+                    <div class="modal-body p-4">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="Id" id="editUserId" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Full Name</label>
+                                <input name="Name" id="editUserName" class="form-control bg-light" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Email Address</label>
+                                <input name="Email" id="editUserEmail" type="email" class="form-control bg-light" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Age</label>
+                                <input name="Age" id="editUserAge" type="number" min="18" max="60" class="form-control bg-light" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">System Role</label>
+                                <select name="Role" id="editUserRole" class="form-select bg-light">
+                                    <option value="guest">Guest</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary px-4 shadow-sm" type="submit">Update User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus me-2"></i>Register New User</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="Create" method="post">
+                    <div class="modal-body p-4">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Full Name</label>
+                                <input name="Name" class="form-control bg-light" placeholder="e.g. Jane Doe" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Email Address</label>
+                                <input name="Email" type="email" class="form-control bg-light" placeholder="user@schoolapp.com" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Age</label>
+                                <input name="Age" type="number" min="18" max="60" class="form-control bg-light" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">System Role</label>
+                                <select name="Role" class="form-select bg-light">
+                                    <option value="guest">Guest</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+
+                            <hr class="text-muted opacity-25 my-4" />
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Password</label>
+                                <div class="input-group">
+                                    <input name="Password" id="modalUserPassword" type="password" class="form-control bg-light border-end-0" required />
+                                    <button class="btn btn-light border border-start-0" type="button" data-toggle-password="modalUserPassword">
+                                        <i class="bi bi-eye text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Confirm Password</label>
+                                <div class="input-group">
+                                    <input name="ConfirmPassword" id="modalUserConfirmPassword" type="password" class="form-control bg-light border-end-0" required />
+                                    <button class="btn btn-light border border-start-0" type="button" data-toggle-password="modalUserConfirmPassword">
+                                        <i class="bi bi-eye text-muted"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Discard</button>
+                        <button class="btn btn-primary px-4 shadow-sm" type="submit">Save User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-trash3 text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Are you sure?</h5>
+                    <p class="text-muted mb-0">You are about to permanently delete <strong id="deleteUserName" class="text-dark"></strong>. This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-top-0 p-4 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-action="Delete" asp-route-role="@role" method="post" id="deleteUserForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="deleteUserId" />
+                        <button class="btn btn-danger px-4 shadow-sm" type="submit">Delete Permanently</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Modal Data Transfer Logic
+        const editUserModal = document.getElementById('editUserModal');
+        if (editUserModal) {
+            editUserModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('editUserId').value = button.getAttribute('data-user-id');
+                document.getElementById('editUserName').value = button.getAttribute('data-user-name');
+                document.getElementById('editUserEmail').value = button.getAttribute('data-user-email');
+                document.getElementById('editUserAge').value = button.getAttribute('data-user-age');
+                document.getElementById('editUserRole').value = button.getAttribute('data-user-role');
+            });
+        }
+
+        const deleteUserModal = document.getElementById('deleteUserModal');
+        if (deleteUserModal) {
+            deleteUserModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('deleteUserId').value = button.getAttribute('data-user-id');
+                document.getElementById('deleteUserName').textContent = button.getAttribute('data-user-name');
+            });
+        }
+
+        // Password Visibility Toggle
+        document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const input = document.getElementById(btn.getAttribute('data-toggle-password'));
+                const icon = btn.querySelector('i');
+                const isHidden = input.type === 'password';
+
+                input.type = isHidden ? 'text' : 'password';
+                icon.classList.toggle('bi-eye', !isHidden);
+                icon.classList.toggle('bi-eye-slash', isHidden);
+            });
+        });
+
+        // Open modal automatically via query parameter
+        @if (openAddUserModal)
+        {
+                <text>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const createUserModalEl = document.getElementById('createUserModal');
+                        if (createUserModalEl) {
+                            new bootstrap.Modal(createUserModalEl).show();
+                            const url = new URL(window.location.href);
+                            url.searchParams.delete('openAddUser');
+                            window.history.replaceState({}, document.title, url.toString());
+                        }
+                    });
+                </text>
+        }
+    </script>
+}
