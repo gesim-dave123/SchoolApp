@@ -1,0 +1,69 @@
+@model SchoolApp.Models.UserModel
+
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-person-plus me-2"></i>Register New User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" method="post" id="createUserForm">
+                <div class="modal-body p-4">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label fw-bold small">Full Name</label>
+                            <input asp-for="Name" class="form-control bg-light" placeholder="e.g. Jane Doe" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label fw-bold small">Email Address</label>
+                            <input asp-for="Email" class="form-control bg-light" placeholder="user@schoolapp.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Age" class="form-label fw-bold small">Age</label>
+                            <input asp-for="Age" class="form-control bg-light" />
+                            <span asp-validation-for="Age" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Role" class="form-label fw-bold small">System Role</label>
+                            <select asp-for="Role" class="form-select bg-light">
+                                <option value="guest">Guest</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="text-muted opacity-25 my-4" />
+
+                        <div class="col-md-6">
+                            <label asp-for="Password" class="form-label fw-bold small">Password</label>
+                            <div class="input-group">
+                                <input asp-for="Password" class="form-control bg-light border-end-0" />
+                                <button class="btn btn-light border border-start-0" type="button" data-toggle-password="Password">
+                                    <i class="bi bi-eye text-muted"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label fw-bold small">Confirm Password</label>
+                            <div class="input-group">
+                                <input asp-for="ConfirmPassword" class="form-control bg-light border-end-0" />
+                                <button class="btn btn-light border border-start-0" type="button" data-toggle-password="ConfirmPassword">
+                                    <i class="bi bi-eye text-muted"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Discard</button>
+                    <button class="btn btn-primary px-4 shadow-sm" type="submit">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

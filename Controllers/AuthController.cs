@@ -19,9 +19,9 @@ namespace SchoolApp.Controllers
         // LOGIN (GET)
         public IActionResult Login()
         {
-            // If already logged in, go to dashboard
+     
             if (User.Identity?.IsAuthenticated == true)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Dashboard");
 
             return View();
         }
@@ -34,7 +34,7 @@ namespace SchoolApp.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // ✅ Check credentials against DB
+            //  Check credentials against DB
             var user = _db.Users.FirstOrDefault(u =>
                 u.Email == model.Email && u.Password == model.Password);
 
@@ -44,7 +44,7 @@ namespace SchoolApp.Controllers
                 return View(model);
             }
 
-            // ✅ Create claims (user info stored in cookie)
+            //  Create claims (user info stored in cookie)
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -70,14 +70,14 @@ namespace SchoolApp.Controllers
                 principal,
                 authProps);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Dashboard");
         }
 
         // REGISTER (GET)
         public IActionResult Register()
         {
             if (User.Identity?.IsAuthenticated == true)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Dashboard");
 
             return View();
         }

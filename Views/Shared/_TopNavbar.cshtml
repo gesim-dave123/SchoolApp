@@ -1,0 +1,14 @@
+<nav class="top-navbar container-fluid" aria-label="Top Navigation">
+    <div class="d-flex align-items-start w-100">
+        <button class="btn btn-light mobile-toggle me-3" onclick="toggleSidebar(event)">
+            <i class="bi bi-list fs-4"></i>
+        </button>
+        <div>
+            <h4 class="fw-bold mb-1 text-dark">@ViewData["Title"]</h4>
+            @if (ViewData["Subtitle"] != null)
+            {
+                <p class="text-muted small mb-0">@ViewData["Subtitle"]</p>
+            }
+        </div>
+    </div>
+</nav>

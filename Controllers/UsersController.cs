@@ -6,7 +6,7 @@ using SchoolApp.Models;
 
 namespace SchoolApp.Controllers
 {
-    [Authorize]  // ✅ All actions require login
+    [Authorize]  //  All actions require login
     public class UsersController : Controller
     {
         private readonly AppDbContext _db;
@@ -15,23 +15,56 @@ namespace SchoolApp.Controllers
         private string CurrentRole =>
             User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "guest";
 
-        public IActionResult Index(string search = "", string filterLetter = "")
+        private string CurrentUserName => User.Identity?.Name ?? "Unknown";
+
+        private void LogActivity(string action, string details)
+        {
+            _db.ActivityLogs.Add(new ActivityLogModel
+            {
+                Action = action,
+                Details = details,
+                PerformedBy = CurrentUserName,
+                CreatedAt = DateTime.Now
+            });
+            _db.SaveChanges();
+        }
+
+        public IActionResult Index(string search = "", string roleFilter = "", int page = 1, int pageSize = 8)
         {
             ViewBag.Role = CurrentRole;
             ViewBag.Search = search;
+            
+            ViewBag.RoleFilter = roleFilter;
 
             var users = _db.Users.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
                 users = users.Where(u => u.Name.Contains(search) || u.Email.Contains(search));
 
-            if (!string.IsNullOrEmpty(filterLetter))
-                users = users.Where(u => u.Name.StartsWith(filterLetter));
+            if (!string.IsNullOrEmpty(roleFilter))
+                users = users.Where(u => u.Role == roleFilter);
 
-            return View(users.ToList());
+            var totalCount = users.Count();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            if (totalPages == 0) totalPages = 1;
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalCount = totalCount;
+
+            var pagedUsers = users
+                .OrderBy(u => u.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return View(pagedUsers);
         }
 
-        [Authorize(Roles = "admin")]  // ✅ Admin only
+        [Authorize(Roles = "admin")]  //  Admin only
         public IActionResult Create()
         {
             ViewBag.Role = CurrentRole;
@@ -46,18 +79,19 @@ namespace SchoolApp.Controllers
             ViewBag.Role = CurrentRole;
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Unable to add user. Please complete all required fields.";
-                return RedirectToAction("Index");
+                TempData["Error"] = "Unable to add user. Please check your inputs.";
+                return RedirectToAction("Index", new { openAddUser = 1 });
             }
 
             if (_db.Users.Any(u => u.Email == model.Email))
             {
                 TempData["Error"] = "Email already exists.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { openAddUser = 1 });
             }
 
             _db.Users.Add(model);
             _db.SaveChanges();
+            LogActivity("User Created", $"User '{model.Name}' ({model.Email}) was created.");
             TempData["Success"] = $"User '{model.Name}' added!";
             return RedirectToAction("Index");
         }
@@ -91,6 +125,7 @@ namespace SchoolApp.Controllers
             existing.Role = model.Role;
 
             _db.SaveChanges();
+            LogActivity("User Edited", $"User '{existing.Name}' (ID: {existing.Id}) was updated.");
             TempData["Success"] = "User updated!";
             return RedirectToAction("Index");
         }
@@ -103,8 +138,11 @@ namespace SchoolApp.Controllers
             var user = _db.Users.Find(id);
             if (user != null)
             {
+                var deletedName = user.Name;
+                var deletedId = user.Id;
                 _db.Users.Remove(user);
                 _db.SaveChanges();
+                LogActivity("User Deleted", $"User '{deletedName}' (ID: {deletedId}) was deleted.");
                 TempData["Success"] = "User deleted.";
             }
             return RedirectToAction("Index");
