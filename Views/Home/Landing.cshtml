@@ -15,121 +15,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-    <style>
-        :root {
-            --primary-dark: #0f172a;
-            --accent-blue: #3b82f6;
-            --glass-bg: rgba(15, 23, 42, 0.8);
-        }
-
-        body {
-            background: #fdfdfd;
-            font-family: 'Poppins', -apple-system, sans-serif;
-            color: #1e293b;
-        }
-
-        /* Glassmorphism Navbar */
-        .navbar-landing {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 1rem 0;
-            transition: all 0.3s ease;
-        }
-
-        /* Vibrant Hero Section */
-        .hero {
-            background: radial-gradient(circle at top right, #1e293b, #0f172a);
-            color: #fff;
-            padding: 120px 0 100px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-            .hero::before {
-                content: "";
-                position: absolute;
-                top: -10%;
-                right: -10%;
-                width: 400px;
-                height: 400px;
-                background: rgba(59, 130, 246, 0.15);
-                filter: blur(80px);
-                border-radius: 50%;
-            }
-
-        .hero-title {
-            font-size: 3.5rem;
-            letter-spacing: -1.5px;
-            line-height: 1.1;
-        }
-
-        .hero-img-container {
-            transform-style: preserve-3d;
-            perspective: 1000px; /* Essential for 3D effect */
-            will-change: transform;
-        }
-
-        .img-fluid {
-            transform: translateZ(20px); /* Add depth to the image itself */
-        }
-
-        /* Feature Tiles */
-        .feature-tile {
-            background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid #eef2f6;
-            padding: 2.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-            .feature-tile:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-                border-color: var(--accent-blue);
-            }
-
-        .icon-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-        }
-
-        /* Buttons */
-        .btn-glow {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-            .btn-glow:hover {
-                transform: scale(1.05);
-                box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
-            }
-
-        .section-label {
-            text-transform: uppercase;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: var(--accent-blue);
-            font-size: 0.8rem;
-        }
-
-        footer {
-            background: #020617;
-            border-top: 1px solid #1e293b;
-            color: #94a3b8;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
+<body class="landing-page">
     <nav class="navbar navbar-expand-lg navbar-dark navbar-landing sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold fs-4" href="#home">
@@ -153,7 +41,7 @@
     <section id="home" class="hero">
         <div class="container">
             <div class="row align-items-center g-5">
-                <div class="col-lg-7 text-center text-lg-start">
+                <div class="col-sm-12 col-lg-7 text-center text-lg-start">
                     <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 mb-3 px-3 py-2 rounded-pill">
                         Managed Education Platform
                     </span>
@@ -168,7 +56,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="col-lg-5 d-none d-lg-block">
+                <div class="col-sm-12 col-lg-5 d-none d-lg-block">
                     <div class="hero-img-container p-2 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10 shadow-lg">
                         <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
                              class="img-fluid rounded-3 shadow" alt="Dashboard Preview">
@@ -187,7 +75,7 @@
             </div>
 
             <div class="row g-4">
-                <div class="col-md-4">
+                <div class="col-sm-12 col-md-4">
                     <div class="feature-tile h-100">
                         <div class="icon-circle bg-primary bg-opacity-10 text-primary">
                             <i class="bi bi-speedometer2"></i>
@@ -196,7 +84,7 @@
                         <p class="text-muted">Monitor total users and revenue growth in real-time through our modern, responsive dashboard.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-12 col-md-4">
                     <div class="feature-tile h-100 border-primary border-opacity-25 shadow-sm">
                         <div class="icon-circle bg-success bg-opacity-10 text-success">
                             <i class="bi bi-shield-lock"></i>
@@ -205,7 +93,7 @@
                         <p class="text-muted">Secure your data with Admin and Guest access levels, ensuring sensitive tasks are kept private.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-12 col-md-4">
                     <div class="feature-tile h-100">
                         <div class="icon-circle bg-info bg-opacity-10 text-info">
                             <i class="bi bi-cash-stack"></i>
@@ -221,11 +109,11 @@
     <footer id="footer" class="py-5">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start mb-4 mb-md-0">
+                <div class="col-sm-12 col-md-6 text-center text-md-start mb-4 mb-md-0">
                     <h5 class="text-white fw-bold mb-3"><i class="bi bi-mortarboard-fill me-2"></i>SchoolApp</h5>
                     <p class="mb-0">Empowering institutions through modern data management.</p>
                 </div>
-                <div class="col-md-6 text-center text-md-end">
+                <div class="col-sm-12 col-md-6 text-center text-md-end">
                     <div class="d-flex justify-content-center justify-content-md-end gap-4 mb-3">
                         <a href="#" class="text-white opacity-50 hover-opacity-100"><i class="bi bi-twitter"></i></a>
                         <a href="#" class="text-white opacity-50"><i class="bi bi-linkedin"></i></a>

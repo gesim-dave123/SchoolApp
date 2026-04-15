@@ -6,47 +6,7 @@
     bool isUserAdmin = Model.Role?.Equals("admin", StringComparison.OrdinalIgnoreCase) ?? false;
 }
 
-<style>
-    .edit-card {
-        border-radius: 16px;
-        overflow: hidden;
-    }
 
-    .form-section-title {
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-    }
-
-    .input-custom {
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
-        padding: 0.6rem 1rem;
-    }
-
-        .input-custom:focus {
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-            border-color: #0d6efd;
-        }
-
-        .input-custom:disabled {
-            background-color: #f8fafc !important;
-            cursor: not-allowed;
-        }
-
-    .btn-edit-theme {
-        background-color: #0d6efd;
-        color: white;
-    }
-
-        .btn-edit-theme:hover {
-            background-color: #0b5ed7;
-            color: white;
-        }
-
-    .text-edit-theme {
-        color: #0d6efd;
-    }
-</style>
 
 <div class="container">
     <div class="row justify-content-center">

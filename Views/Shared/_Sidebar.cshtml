@@ -1,0 +1,53 @@
+<aside class="sidebar" id="sidebar" onclick="expandSidebarOnClick(event)">
+    <div class="brand">
+        <div class="d-flex align-items-center">
+            <div class="bg-primary rounded-3 p-1 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="bi bi-mortarboard-fill text-white fs-5"></i>
+            </div>
+            <span class="brand-text">SchoolApp</span>
+        </div>
+        <button class="btn btn-sm brand-toggle" onclick="toggleSidebar(event)" id="toggle-btn" title="Collapse sidebar">
+            <i class="bi bi-layout-sidebar"></i>
+        </button>
+    </div>
+
+    <nav class="nav-wrapper" aria-label="Sidebar Navigation">
+        @{
+            var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        }
+
+        <a href="@Url.Action("Index", "Dashboard")" class="nav-link @(currentController == "Dashboard" ? "active" : "")">
+            <i class="bi bi-house-door"></i> <span class="nav-label">Dashboard</span>
+        </a>
+
+        <a href="@Url.Action("Index", "Users")" class="nav-link @(currentController == "Users" ? "active" : "")">
+            <i class="bi bi-people"></i> <span class="nav-label">Manage User</span>
+        </a>
+
+        <a href="@Url.Action("Index", "Transactions")" class="nav-link @(currentController == "Transactions" ? "active" : "")">
+            <i class="bi bi-wallet2"></i> <span class="nav-label">Manage Transaction</span>
+        </a>
+
+        @if (User.IsInRole("admin"))
+        {
+            <a href="@Url.Action("Index", "ActivityLogs")" class="nav-link @(currentController == "ActivityLogs" ? "active" : "")">
+                <i class="bi bi-journal-text"></i> <span class="nav-label">Activity Logs</span>
+            </a>
+        }
+    </nav>
+
+    <div class="user-profile-box mt-auto">
+        <div class="d-flex align-items-center mb-3">
+            <div class="avatar me-2 bg-info rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 35px; height: 35px;">
+                @User.Identity?.Name?.Substring(0, 1).ToUpper()
+            </div>
+            <div class="overflow-hidden user-info">
+                <div class="text-white small fw-bold text-truncate">@User.Identity?.Name</div>
+                <span class="badge bg-opacity-25 bg-light text-white" style="font-size: 0.6rem;">@ViewBag.Role?.ToString().ToUpper()</span>
+            </div>
+        </div>
+        <a asp-controller="Auth" asp-action="Logout" class="btn btn-sm btn-outline-danger w-100 border-0 bg-danger bg-opacity-10">
+            <i class="bi bi-box-arrow-left me-2"></i><span class="signout-label">Sign Out</span>
+        </a>
+    </div>
+</aside>

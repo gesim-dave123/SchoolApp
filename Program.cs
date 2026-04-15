@@ -29,7 +29,6 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
 
-    // ✅ Seed a default admin account if no users exist
     if (!db.Users.Any())
     {
         db.Users.Add(new SchoolApp.Models.UserModel
@@ -46,11 +45,11 @@ using (var scope = app.Services.CreateScope())
 
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthentication();  // ✅ Must be before UseAuthorization
+app.UseAuthentication();  
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Landing}/{id?}"); // ✅ Start at Landing page
+    pattern: "{controller=Home}/{action=Landing}/{id?}"); 
 
 app.Run();

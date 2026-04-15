@@ -9,5 +9,6 @@ namespace SchoolApp.Data
 
         public DbSet<UserModel> Users { get; set; }
         public DbSet<TransactionModel> Transactions { get; set; }
+        public DbSet<ActivityLogModel> ActivityLogs { get; set; }
     }
 }
